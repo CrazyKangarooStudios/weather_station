@@ -54,9 +54,8 @@ app.get("/hello", (req, res, next) => {
  //fetch("http://192.168.2.130/")
  await rp(url)
  .then(  async function(html){
-
    //success!
-   //console.log(html);
+   console.log(html);
    var dt = dateTime.create();
    var formatted = dt.format('Y-m-d H:M:S');
    
