@@ -10,7 +10,8 @@ SFE_BMP180 pressure; //Creating an object
 // Daten des WiFi-Netzwerks
 const char* ssid     = "WLAN-949910";
 const char* password = "14157163383930886305";
-
+const long interval = 7000;
+unsigned long previousMillis = 0;
 // Port des Web Servers auf 80 setzen
 WiFiServer server(80);
  double T, P, p0; //Creating variables for temp, pressure and relative pressure
@@ -43,10 +44,17 @@ void setup() {
 }
 
 void loop() {
+  unsigned long currentMillis = millis();
+
+  if (currentMillis - previousMillis >= interval) {
    getData();
+    previousMillis = currentMillis;
+  }
+   
   WiFiClient client = server.available();   // Auf Clients (Server-Aufrufe) warten
 
-  if (client) {                             // Bei einem Aufruf des Servers
+  if (client) {
+   // Bei einem Aufruf des Servers
     Serial.println("Client available");
     String currentLine = "";                // String definieren für die Anfrage des Clients
 
@@ -54,7 +62,7 @@ void loop() {
 
       if (client.available()) {
         char c = client.read();             // Ein (1) Zeichen der Anfrage des Clients lesen
-        Serial.write(c);                    // und es im Seriellen Monitor ausgeben
+      //  Serial.write(c);                    // und es im Seriellen Monitor ausgeben
         header += c;
         if (c == '\n') {                    // bis eine Neue Zeile ausgegeben wird
 
@@ -90,8 +98,8 @@ void loop() {
     header = "";
     // Die Verbindung beenden
     client.stop();
-    Serial.println("Client disconnected");
-    Serial.println("");
+  //  Serial.println("Client disconnected");
+   // Serial.println("");
   }
 }
 
@@ -99,19 +107,13 @@ void getData()
 {
   char status;
 
-  Serial.print("You provided altitude: ");
-  Serial.print(ALTITUDE, 0);
-  Serial.println(" meters");
-
   status = pressure.startTemperature();
   if (status != 0) {
     delay(status);
 
     status = pressure.getTemperature(T);
     if (status != 0) {
-      Serial.print("Temp: ");
-      Serial.print(T, 1);
-      Serial.println(" deg C");
+
 
       status = pressure.startPressure(3);
 
@@ -120,17 +122,12 @@ void getData()
 
         status = pressure.getPressure(P, T);
         if (status != 0) {
-          Serial.print("Pressure measurement: ");
-          Serial.print(P);
-          Serial.println(" hPa (Pressure measured using temperature)");
-
+        
           p0 = pressure.sealevel(P, ALTITUDE);
-          Serial.print("Relative (sea-level) pressure: ");
-          Serial.print(p0);
-          Serial.println("hPa");
+         
         }
       }
     }
   }  
-  delay(100);
+ // delay(100);
 }

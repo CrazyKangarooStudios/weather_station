@@ -7,7 +7,7 @@ const url = 'http://192.168.2.130/';
 const fs = require('fs')
 var T;
 var P;
-const requestdelay=5000;
+const requestdelay=10000;
 // Handling GET / request
 app.use("/", async(req, res, next) => {
     var data = fs.readFileSync('./data.txt', 'utf8')
@@ -55,7 +55,7 @@ app.get("/hello", (req, res, next) => {
  await rp(url)
  .then(  async function(html){
    //success!
-   console.log(html);
+  // console.log(html);
    var dt = dateTime.create();
    var formatted = dt.format('Y-m-d H:M:S');
    
