@@ -1,13 +1,16 @@
 const express = require("express")
 const app = express()
+const path= require("path")
 const { plot } =require('nodeplotlib')
 const rp = require('request-promise');
 var dateTime = require('node-datetime');
-const url = 'http://192.168.2.130/';
+const url = "https://weather-station.crazykaenguru.repl.co/"//'http://192.168.2.130/';
 const fs = require('fs')
 var T;
 var P;
-const requestdelay=10000;
+const requestdelay=60000;
+app.set('views', path.join(__dirname, 'views'));
+    app.set('view engine', 'ejs');
 // Handling GET / request
 app.use("/", async(req, res, next) => {
     var data = fs.readFileSync('./data.txt', 'utf8')
@@ -15,6 +18,7 @@ app.use("/", async(req, res, next) => {
     data=data.split("\n")
     var currentdata= data[data.length-2]
     var allT=[];
+    var alltime=[];
     currentdata=currentdata.split("_")
     console.log(currentdata)
     T=currentdata[0] 
@@ -23,20 +27,21 @@ app.use("/", async(req, res, next) => {
     {
       allT.push((data[i]).toString().split("_")[0])
     }
-    allT=allT.slice(-10)
+    for(var i=0;i<data.length;i++)
+    {
+      if((data[i]).toString().split("_")[2]!=undefined)
+      {
+      alltime.push((data[i]).toString().split("_")[2])
+      }
+    }
+   // allT=allT.slice(-10)
    // console.log(allT)
    //console.log(allT)
     res.header(2)
-    res.send("Temperature: "+T+" Pressure: "+P)
-    const datal= [
-        {
-          y: allT,
-          //y: [3, 12, 1, 4],
-          type: 'scatter',
-        },
-      ];
-      
-      plot(datal);
+   // res.send("Temperature: "+T+" Pressure: "+P)
+   console.log(alltime)
+   res.render('index',{temp:allT,time:alltime});
+    
 })
   
 // Handling GET /hello request
@@ -73,6 +78,6 @@ app.get("/hello", (req, res, next) => {
 }
   
 // Server setup
-app.listen(3000, () => {
+app.listen(process.env.PORT||3000, () => {
     console.log("Server is Running")
 })

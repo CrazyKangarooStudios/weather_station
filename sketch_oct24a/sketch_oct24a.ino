@@ -28,6 +28,7 @@ void setup() {
     delay(500);
     Serial.print(".");
   }
+  WiFiServer server(80);
   // Lokale IP-Adresse im Seriellen Monitor ausgeben und Server starten
   Serial.println("");
   Serial.println("WiFi connected");
