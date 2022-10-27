@@ -4,10 +4,16 @@
  * All rights reserved.
  * https://circuits4you.com 
  * Connects to WiFi HotSpot. */
+ #include <NTPClient.h>
+ #include <WiFiUdp.h>
+ #define NTP_OFFSET   80 * 90      // In seconds
+#define NTP_INTERVAL 60 * 1000    // In miliseconds
+#define NTP_ADDRESS  "europe.pool.ntp.org"
+
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, NTP_ADDRESS, NTP_OFFSET, NTP_INTERVAL);
 #include <SFE_BMP180.h> //Including BMP180 library
-
 #define ALTITUDE 522 //Altitude where I live (change this to your altitude)
-
 SFE_BMP180 pressure; //Creating an object
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h> 
@@ -31,6 +37,7 @@ const char *host = "https://weather-station.crazykaenguru.repl.co/";   //https:/
 //=======================================================================
 
 void setup() {
+  timeClient.begin();
   client.setInsecure();
   delay(1000);
   Serial.begin(115200);
@@ -67,7 +74,10 @@ void setup() {
 //                    Main Program Loop
 //=======================================================================
 void loop() {
+timeClient.update();
   unsigned long currentMillis = millis();
+  String formattedTime = timeClient.getFormattedTime();
+  Serial.print(formattedTime);
 
   if (currentMillis - previousMillis >= interval) {
    getData();
@@ -81,11 +91,12 @@ void loop() {
   station = "B";
 
   //GET Data
-  getData =String(T)+"_"+String(p0); //"?status=" + ADCData + "&station=" + station ;  //Note "?" added at front
+  getData =String(T)+"_"+String(p0)+"_"+String(formattedTime); //"?status=" + ADCData + "&station=" + station ;  //Note "?" added at front
   Link = "https://weather-station.crazykaenguru.repl.co/" + getData;
   
   http.begin(client,Link);     //Specify request destination
-  
+//  getData();
+ 
   int httpCode = http.GET();            //Send the request
   String payload = http.getString();    //Get the response payload
 

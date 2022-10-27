@@ -3,7 +3,6 @@ const app = express()
 const path= require("path")
 const { plot } =require('nodeplotlib')
 const rp = require('request-promise');
-var dateTime = require('node-datetime');
 const url = "https://weather-station.crazykaenguru.repl.co/"//'http://192.168.2.130/';
 const fs = require('fs')
 var T;
@@ -19,14 +18,26 @@ app.use("/", async(req, res, next) => {
     var currentdata= data[data.length-2]
     var allT=[];
     var alltime=[];
+    var allP=[]
     currentdata=currentdata.split("_")
-    console.log(currentdata)
+    
+   // console.log(currentdata)
     T=currentdata[0] 
     P=currentdata[1]
     for(var i=0;i<data.length;i++)
     {
       allT.push((data[i]).toString().split("_")[0])
+
     }
+    for(var i=0;i<data.length;i++)
+    {i
+      allP.push((data[i]).toString().split("_")[1])
+    
+    }
+    allT.pop()
+    allP.pop()
+    console.log(allP)
+  
     for(var i=0;i<data.length;i++)
     {
       if((data[i]).toString().split("_")[2]!=undefined)
@@ -39,8 +50,8 @@ app.use("/", async(req, res, next) => {
    //console.log(allT)
     res.header(2)
    // res.send("Temperature: "+T+" Pressure: "+P)
-   console.log(alltime)
-   res.render('index',{temp:allT,time:alltime});
+  // console.log(alltime)
+   res.render('index',{temp:allT,time:alltime,pressure:allP});
     
 })
   
@@ -61,10 +72,8 @@ app.get("/hello", (req, res, next) => {
  .then(  async function(html){
    //success!
   // console.log(html);
-   var dt = dateTime.create();
-   var formatted = dt.format('Y-m-d H:M:S');
    
-   var dataset = `${html.toString().split("_")[0]}_${html.toString().split("_")[1].split('\r')[0]}_${formatted}\n`
+   var dataset = `${html.toString().split("_")[0]}_${html.toString().split("_")[1].split('\r')[0]}_${html.toString().split("_")[2]}\n`
   
  
  // data= JSON.parse(data)
