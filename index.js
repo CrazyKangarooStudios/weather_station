@@ -4,6 +4,8 @@ const path= require("path")
 const { plot } =require('nodeplotlib')
 const rp = require('request-promise');
 const url = "https://weather-station.crazykaenguru.repl.co/"//'http://192.168.2.130/';
+const { config } = require('dotenv');
+config()
 const fs = require('fs')
 var T;
 var P;
@@ -11,7 +13,7 @@ const requestdelay=60000;
 app.set('views', path.join(__dirname, 'views'));
     app.set('view engine', 'ejs');
 // Handling GET / request
-app.use("/", async(req, res, next) => {
+app.get("/", async(req, res, next) => {
     var data = fs.readFileSync('./data.txt', 'utf8')
     data=data.toString()
     data=data.split("\n")
@@ -51,15 +53,16 @@ app.use("/", async(req, res, next) => {
     res.header(2)
    // res.send("Temperature: "+T+" Pressure: "+P)
   // console.log(alltime)
-   res.render('index',{temp:allT,time:alltime,pressure:allP});
+   res.render('index',{temp:allT,time:alltime,pressure:allP,datatxt:fs.readFileSync('./data.txt', 'utf8')});
     
 })
   
 // Handling GET /hello request
-app.get("/hello", (req, res, next) => {
-    res.header(2)
-    res.send("This is the hello response");
-    
+app.post("/delete", (req, res, next) => {
+  res.writeHead(302, {
+    location: process.env.url,
+  });
+  res.end();
 })
 
     setInterval(function(){
